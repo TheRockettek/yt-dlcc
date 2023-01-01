@@ -61,22 +61,21 @@ local function dumpBuffer()
             table.remove(buffer, 1)
             bufferSize = bufferSize - 1
             bufferBytes = bufferBytes - #bufferChunk
-
-            sleep(0)
-            dumpBuffer()
         end
     end
 end
 
 while true do
     local event, paramA, paramB, paramC = os.pullEvent()
-    if event == "websocket_message" then
+    if event == "speaker_audio_empty" then
+        dumpBuffer()
+    elseif event == "websocket_message" then
         bufferSize = bufferSize + 1
         transferredSize = transferredSize + #paramB
         bufferBytes = bufferBytes + #paramB
         chunkOrder = chunkOrder + 1
 
-        print("Recv " .. chunkOrder .. " " .. #paramB)
+        print("Recv " .. chunkOrder .. " " .. #paramB .. " " .. paramB)
         table.insert(buffer, {order=chunkOrder, data=paramB})
     elseif event == "timer" then
         statTimer = os.startTimer(statDelay)
