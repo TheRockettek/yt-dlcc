@@ -70,9 +70,7 @@ end
 
 while true do
     local event, paramA, paramB, paramC = os.pullEvent()
-    if event == "speaker_audio_empty" then
-        dumpBuffer()
-    elseif event == "websocket_message" then
+    if event == "websocket_message" then
         bufferSize = bufferSize + 1
         transferredSize = transferredSize + #paramB
         bufferBytes = bufferBytes + #paramB
@@ -83,7 +81,6 @@ while true do
     elseif event == "timer" then
         statTimer = os.startTimer(statDelay)
         print("Sz: " .. tostring(bufferSize) .. " Buf:" .. tostring(bufferBytes) .. " Tx:".. tostring(transferredSize))
-        dumpBuffer()
     elseif event == "websocket_success" then
         print("Connected to gateway")
         websocket = paramB
