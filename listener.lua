@@ -54,7 +54,8 @@ local chunkOrder = 0
 local function dumpBuffer()
     if #buffer > 0 then
         local bufferChunk = buffer[1]
-        local ok = speaker.playAudio(bufferChunk.data)
+        local chunkBuffer = decoder(bufferChunk.data)
+        local ok = speaker.playAudio(chunkBuffer)
         if ok then
             print("Queued chunk " .. bufferChunk.order)
             table.remove(buffer, 1)
@@ -69,14 +70,12 @@ while true do
     if event == "speaker_audio_empty" then
         dumpBuffer()
     elseif event == "websocket_message" then
-        local chunk =  paramB
-        local chunkBuffer = decoder(chunk)
-        transferredSize = transferredSize + #chunk
         bufferSize = bufferSize + 1
+        transferredSize = transferredSize + #chunk
         bufferBytes = bufferBytes + #chunk
         chunkOrder = chunkOrder + 1
 
-        table.insert(buffer, {order=chunkOrder, data=chunkBuffer})
+        table.insert(buffer, {order=chunkOrder, data=paramB})
     elseif event == "timer" then
         statTimer = os.startTimer(statDelay)
         print("Sz: " .. tostring(bufferSize) .. " Buf:" .. tostring(bufferBytes) .. " Tx:".. tostring(transferredSize))
