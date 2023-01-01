@@ -61,6 +61,7 @@ local function dumpBuffer()
             table.remove(buffer, 1)
             bufferSize = bufferSize - 1
             bufferBytes = bufferBytes - #bufferChunk
+            dumpBuffer()
         end
     end
 end
@@ -96,5 +97,5 @@ end
 print("Emptying buffer...")
 while bufferSize > 0 do
     dumpBuffer()
-    sleep(1)
+    sleep(0)
 end
