@@ -75,7 +75,7 @@ while true do
         bufferBytes = bufferBytes + #paramB
         chunkOrder = chunkOrder + 1
 
-        print("Recv " .. chunkOrder .. " " .. #paramB .. " " .. paramB)
+        print("Recv " .. chunkOrder .. " " .. #paramB)
         table.insert(buffer, {order=chunkOrder, data=paramB})
     elseif event == "timer" then
         statTimer = os.startTimer(statDelay)
