@@ -29,6 +29,8 @@ func main() {
 	flag.Parse()
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Connection made")
+
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			log.Print("upgrade failed: ", err)
@@ -51,6 +53,8 @@ func main() {
 				log.Println("read failed:", err)
 				break
 			}
+
+			println("Query", query.URL)
 
 			if validateURL(query.URL) {
 				log.Println("Query for " + query.URL)

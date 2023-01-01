@@ -37,7 +37,7 @@ end
 local dfpwm = require("cc.audio.dfpwm")
 local decoder = dfpwm.make_decoder()
 
-local websocket = http.websocket(gateway)
+local websocket = http.websocketAsync(gateway)
 
 local buffer = {}
 local bufferSize = 0
