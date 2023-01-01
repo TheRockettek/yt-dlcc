@@ -61,7 +61,8 @@ func main() {
 
 			if validateURL(query.URL) {
 				log.Println("Query for " + query.URL)
-				command := fmt.Sprintf("yt-dlp --quiet %s -o - | ffmpeg -hide_banner -loglevel error -nostats -i pipe: -ac 1 -f wav -c:a pcm_s16le -ar 48000 pipe: | ffmpeg -hide_banner -loglevel error -nostats -i pipe: -b:a 48000 -c:a dfpwm -f dfpwm pipe:", query.URL)
+				// command := fmt.Sprintf("yt-dlp --quiet %s -o - | ffmpeg -hide_banner -loglevel error -nostats -i pipe: -ac 1 -f wav -c:a pcm_s16le pipe: | ffmpeg -hide_banner -loglevel error -nostats -i pipe: -b:a 48000 -ar 48000 -c:a dfpwm -f dfpwm pipe:", query.URL)
+				command := fmt.Sprintf("yt-dlp --quiet %s -o - | ffmpeg -hide_banner -loglevel error -nostats -i pipe: -filter:a \"volume=0.5\" -f dfpwm -ar 48000 -ac 1 pipe:", query.URL)
 
 				cmd := exec.Command("bash", "-c", command)
 				stdout, err := cmd.StdoutPipe()

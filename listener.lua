@@ -61,6 +61,8 @@ local function dumpBuffer()
             table.remove(buffer, 1)
             bufferSize = bufferSize - 1
             bufferBytes = bufferBytes - #bufferChunk
+
+            sleep(0)
             dumpBuffer()
         end
     end
@@ -76,6 +78,7 @@ while true do
         bufferBytes = bufferBytes + #paramB
         chunkOrder = chunkOrder + 1
 
+        print("Recv " .. chunkOrder .. " " .. #paramB)
         table.insert(buffer, {order=chunkOrder, data=paramB})
     elseif event == "timer" then
         statTimer = os.startTimer(statDelay)
