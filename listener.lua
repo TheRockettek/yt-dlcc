@@ -65,7 +65,7 @@ while true do
     local event, paramA, paramB, paramC = os.pullEvent()
     if event == "speaker_audio_empty" then
         dumpBuffer()
-    if event == "websocket_message" then
+    elseif event == "websocket_message" then
         local chunk =  paramB
         local chunkBuffer = decoder(chunk)
         local transferredSize = transferredSize + #chunk
