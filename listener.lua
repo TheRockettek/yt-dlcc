@@ -80,6 +80,7 @@ while true do
     elseif event == "timer" then
         statTimer = os.startTimer(statDelay)
         print("Sz: " .. tostring(bufferSize) .. " Buf:" .. tostring(bufferBytes) .. " Tx:".. tostring(transferredSize))
+        dumpBuffer()
     elseif event == "websocket_success" then
         print("Connected to gateway")
         websocket = paramB
