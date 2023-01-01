@@ -57,7 +57,7 @@ local function dumpBuffer()
         local chunkBuffer = decoder(bufferChunk.data)
         local ok = speaker.playAudio(chunkBuffer)
         if ok then
-            print("Queued chunk " .. bufferChunk.order .. " " .. #bufferChunk.size ..  " ".. #chunkBuffer)
+            print("Queued chunk " .. bufferChunk.order .. " " .. #bufferChunk.data ..  " ".. #chunkBuffer)
             table.remove(buffer, 1)
             bufferSize = bufferSize - 1
             bufferBytes = bufferBytes - #bufferChunk
