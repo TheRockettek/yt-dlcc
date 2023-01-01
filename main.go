@@ -90,11 +90,29 @@ func main() {
 				println(len(packets))
 				conn.WriteMessage(websocket.TextMessage, []byte(string(strconv.FormatInt(int64(len(packets)), 10))))
 
-				for _, packet := range packets {
+				bunchCount := 50
+
+				confCmd := []byte("CONF")
+
+				for packetIndex, packet := range packets {
 					err = conn.WriteMessage(websocket.BinaryMessage, packet)
 					if err != nil {
 						log.Println("write failed:", err)
 						break
+					}
+
+					if packetIndex%bunchCount == 0 {
+						err = conn.WriteMessage(websocket.BinaryMessage, confCmd)
+						if err != nil {
+							log.Println("write failed:", err)
+							break
+						}
+
+						_, _, err := conn.ReadMessage()
+						if err != nil {
+							log.Println("read failed:", err)
+							break
+						}
 					}
 				}
 

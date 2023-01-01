@@ -51,11 +51,15 @@ local packetsTotal = 0
 while true do
     local event, paramA, paramB, paramC = os.pullEvent()
     if event == "websocket_message" then
-        table.insert(buffer, paramB)
+        if paramB == "CONF" then
+            websocket.send("ACK")
+        else
+            table.insert(buffer, paramB)
 
-        packetsReceived = packetsReceived + 1
-        if packetsReceived == packetsTotal then
-            break
+            packetsReceived = packetsReceived + 1
+            if packetsReceived == packetsTotal then
+                break
+            end
         end
     elseif event == "timer" then
         statTimer = os.startTimer(statDelay)
