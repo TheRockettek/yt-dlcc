@@ -6,7 +6,7 @@ local query = args[1]
 local gateway = args[2] or defaultGateway
 
 local function printUsage()
-    if defaultGateway == nil or defaultGateway = "" then
+    if defaultGateway == nil or defaultGateway == "" then
         printError("Usage: " .. shell.getRunningProgram() .. " <query> <gateway>")
     else
         printError("Usage: " .. shell.getRunningProgram() .. " <query> [gateway]")
@@ -70,6 +70,7 @@ while true do
         end
     elseif event == "websocket_success" then
         print("Connected to gateway")
+        websocket.send(textutils.serializeJSON({url=query}))
         break
     elseif event == "websocket_closed" then
         print("Connection closed")
