@@ -92,4 +92,9 @@ while true do
         print("Failed to connect to gateway")
         break
     end
+
+    while bufferSize > 0 then
+        dumpBuffer()
+        sleep(1)
+    end
 end
