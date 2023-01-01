@@ -61,7 +61,7 @@ while true do
         local transferredSize = transferredSize + #chunk
         print("Transferred: " .. transferredSize)
 
-        while not speaker.playAudio(chunkBuffer) do
+        while not speaker.playAudio(buffer) do
             os.pullEvent("speaker_audio_empty")
         end
     elseif event == "websocket_success" then
