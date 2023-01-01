@@ -84,9 +84,10 @@ func main() {
 						break
 					}
 
-					packets = append(packets, packets...)
+					packets = append(packets, tmp)
 				}
 
+				println(len(packets))
 				conn.WriteMessage(websocket.TextMessage, []byte(string(strconv.FormatInt(int64(len(packets)), 10))))
 
 				for _, packet := range packets {
@@ -96,6 +97,8 @@ func main() {
 						break
 					}
 				}
+
+				print("Sent packets")
 			}
 		}
 	})

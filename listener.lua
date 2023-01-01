@@ -51,8 +51,7 @@ local packetsTotal = 0
 while true do
     local event, paramA, paramB, paramC = os.pullEvent()
     if event == "websocket_message" then
-        local decoded = decoder(paramB)
-        table.insert(buffer, decoded)
+        table.insert(buffer, paramB)
 
         packetsReceived = packetsReceived + 1
         if packetsReceived == packetsTotal then
@@ -81,7 +80,8 @@ while true do
 end
 
 for _, chunk in pairs(buffer) do
-    while not speaker.playAudio(chunk) do
+    local decoded = decoder(chunk)
+    while not speaker.playAudio(decoded) do
         os.pullEvent("speaker_audio_empty")
     end
 end
