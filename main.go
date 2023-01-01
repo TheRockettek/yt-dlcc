@@ -56,11 +56,11 @@ func main() {
 
 			println("Query", query.URL)
 
+			// var b bytes.Buffer
+
 			if validateURL(query.URL) {
 				log.Println("Query for " + query.URL)
-				command := fmt.Sprintf("yt-dlp %s -o - | ffmpeg -i pipe: -c:a dfpwm -b:a 48k -f wav pipe:", query.URL)
-
-				println(command)
+				command := fmt.Sprintf("yt-dlp --quiet %s -o - | ffmpeg -hide_banner -loglevel error -nostats -i pipe: -f wav -c:a pcm_s16le -ar 48000 pipe: | ffmpeg -hide_banner -loglevel error -nostats -i pipe: -c:a dfpwm -ar 48000 -f dfpwm pipe:", query.URL)
 
 				cmd := exec.Command("bash", "-c", command)
 				stdout, err := cmd.StdoutPipe()
@@ -82,12 +82,16 @@ func main() {
 						break
 					}
 
+					// b.Write(tmp)
+
 					err = conn.WriteMessage(mt, tmp)
 					if err != nil {
 						log.Println("write failed:", err)
 						break
 					}
 				}
+
+				// os.WriteFile("out", b.Bytes(), 0644)
 			}
 		}
 	})
