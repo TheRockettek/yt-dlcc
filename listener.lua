@@ -40,9 +40,6 @@ local decoder = dfpwm.make_decoder()
 local websocket
 http.websocketAsync(gateway)
 
-local buffer = {}
-local bufferSize = 0
-
 local transferredSize = 0
 
 local statDelay = 1
@@ -58,22 +55,17 @@ end
 
 while true do
     local event, paramA, paramB, paramC = os.pullEvent()
-    if event == "speaker_audio_empty" then
-        dumpBuffer()
-    elseif event == "websocket_message" then
+    if event == "websocket_message" then
         local chunk = paramB
         local chunkBuffer = decoder(chunk)
         local transferredSize = transferredSize + #chunk
-        local bufferSize = bufferSize + #chunk
-        for _, v in pairs(chunkBuffer) do
-            table.insert(buffer, v)
+        while not speaker.playAudio(chunkBuffer) do
+            os.pullEvent("speaker_audio_empty")
         end
-        print("Transferred: " .. transferredSize .. " Buffer: " .. bufferSize)
-        dumpBuffer()
     elseif event == "timer" then
         if paramA == statTimer then
             statTimer = os.startTimer(statDelay)
-            print("Transferred: " .. transferredSize .. " Buffer: " .. bufferSize)
+            print("Transferred: " .. transferredSize)
         end
     elseif event == "websocket_success" then
         print("Connected to gateway")
