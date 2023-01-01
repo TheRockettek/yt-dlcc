@@ -37,7 +37,8 @@ end
 local dfpwm = require("cc.audio.dfpwm")
 local decoder = dfpwm.make_decoder()
 
-local websocket = http.websocketAsync(gateway)
+local websocket
+http.websocketAsync(gateway)
 
 local buffer = {}
 local bufferSize = 0
@@ -70,6 +71,7 @@ while true do
         end
     elseif event == "websocket_success" then
         print("Connected to gateway")
+        websocket = paramC
         websocket.send(textutils.serializeJSON({url=query}))
         break
     elseif event == "websocket_closed" then
