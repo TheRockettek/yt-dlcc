@@ -71,9 +71,8 @@ while true do
         end
     elseif event == "websocket_success" then
         print("Connected to gateway")
-        websocket = paramC
+        websocket = paramB
         websocket.send(textutils.serializeJSON({url=query}))
-        break
     elseif event == "websocket_closed" then
         print("Connection closed")
         break

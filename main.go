@@ -48,7 +48,7 @@ func main() {
 			}
 
 			var query query
-			err = jsoniter.Unmarshal(message, query)
+			err = jsoniter.Unmarshal(message, &query)
 			if err != nil {
 				log.Println("read failed:", err)
 				break
@@ -58,7 +58,9 @@ func main() {
 
 			if validateURL(query.URL) {
 				log.Println("Query for " + query.URL)
-				command := fmt.Sprintf("yt-dlp %s -o - | ffmpeg -i pipe: -c:a dfpwm -f wav pipe:", query.URL)
+				command := fmt.Sprintf("yt-dlp %s -o - | ffmpeg -i pipe: -c:a dfpwm -b:a 48k -f wav pipe:", query.URL)
+
+				println(command)
 
 				cmd := exec.Command("bash", "-c", command)
 				stdout, err := cmd.StdoutPipe()
