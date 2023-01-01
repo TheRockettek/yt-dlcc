@@ -71,8 +71,8 @@ while true do
         dumpBuffer()
     elseif event == "websocket_message" then
         bufferSize = bufferSize + 1
-        transferredSize = transferredSize + #chunk
-        bufferBytes = bufferBytes + #chunk
+        transferredSize = transferredSize + #paramB
+        bufferBytes = bufferBytes + #paramB
         chunkOrder = chunkOrder + 1
 
         table.insert(buffer, {order=chunkOrder, data=paramB})
