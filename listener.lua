@@ -49,35 +49,38 @@ local buffer = {}
 local bufferSize = 0
 local bufferBytes = 0
 
+local chunkOrder = 0
+
 local function dumpBuffer()
     if #buffer > 0 then
         local bufferChunk = buffer[1]
-        local ok = speaker.playAudio(bufferChunk)
+        local ok = speaker.playAudio(bufferChunk.data)
         if ok then
+            print("Queued chunk " .. bufferChunk.order)
             table.remove(buffer, 1)
-            local bufferSize = bufferSize - 1
-            local bufferBytes = bufferBytes - #bufferChunk
+            bufferSize = bufferSize - 1
+            bufferBytes = bufferBytes - #bufferChunk
+
+            dumpBuffer()
         end
     end
 end
 
 while true do
     local event, paramA, paramB, paramC = os.pullEvent()
-    if event == "speaker_audio_empty" then
-        dumpBuffer()
-    elseif event == "websocket_message" then
+    if event == "websocket_message" then
         local chunk =  paramB
         local chunkBuffer = decoder(chunk)
-        local transferredSize = transferredSize + #chunk
-        local bufferSize = bufferSize + 1
-        local bufferBytes = bufferBytes + #chunk
+        transferredSize = transferredSize + #chunk
+        bufferSize = bufferSize + 1
+        bufferBytes = bufferBytes + #chunk
+        chunkOrder = chunkOrder + 1
 
-        table.insert(buffer, chunkBuffer)
-        print("Transferred: " .. transferredSize)
-        dumpBuffer()
+        table.insert(buffer, {order=chunkOrder, data=chunkBuffer})
     elseif event == "timer" then
         statTimer = os.startTimer(statDelay)
         print("Sz: " .. tostring(bufferSize) .. " Buf:" .. tostring(bufferBytes) .. " Tx:".. tostring(transferredSize))
+        dumpBuffer()
     elseif event == "websocket_success" then
         print("Connected to gateway")
         websocket = paramB
