@@ -48,14 +48,18 @@ local transferredSize = 0
 local statDelay = 1
 local statTimer = os.startTimer(0)
 
+local function dumpBuffer()
+    local ok = speaker.playAudio(buffer)
+    if ok then
+        buffer = {}
+        local bufferSize = 0
+    end
+end
+
 while true do
     local event, paramA, paramB, paramC = os.pullEvent()
     if event == "speaker_audio_empty" then
-        local ok = speaker.playAudio(buffer)
-        if ok then
-            buffer = {}
-            local bufferSize = 0
-        end
+        dumpBuffer()
     elseif event == "websocket_message" then
         local chunk = paramB
         local chunkBuffer = decoder(chunk)
@@ -64,6 +68,8 @@ while true do
         for _, v in pairs(chunkBuffer) do
             table.insert(buffer, v)
         end
+        dumpBuffer()
+        print("Transferred: " .. transferredSize .. " Buffer: " .. bufferSize)
     elseif event == "timer" then
         if paramA == statTimer then
             statTimer = os.startTimer(statDelay)
