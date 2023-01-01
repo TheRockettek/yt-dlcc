@@ -75,7 +75,7 @@ func main() {
 				}
 
 				for {
-					tmp := make([]byte, 65536)
+					tmp := make([]byte, 32768)
 					_, err := stdout.Read(tmp)
 					if err != nil {
 						log.Println("read stdout failed:", err)

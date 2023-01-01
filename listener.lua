@@ -68,8 +68,8 @@ while true do
         for _, v in pairs(chunkBuffer) do
             table.insert(buffer, v)
         end
-        dumpBuffer()
         print("Transferred: " .. transferredSize .. " Buffer: " .. bufferSize)
+        dumpBuffer()
     elseif event == "timer" then
         if paramA == statTimer then
             statTimer = os.startTimer(statDelay)
