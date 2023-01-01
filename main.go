@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"strconv"
 
 	"github.com/gorilla/websocket"
 	jsoniter "github.com/json-iterator/go"
@@ -73,6 +74,8 @@ func main() {
 					break
 				}
 
+				packets := make([][]byte, 0)
+
 				for {
 					tmp := make([]byte, 1024*16)
 					_, err := stdout.Read(tmp)
@@ -81,7 +84,13 @@ func main() {
 						break
 					}
 
-					err = conn.WriteMessage(websocket.BinaryMessage, tmp)
+					packets = append(packets, packets...)
+				}
+
+				conn.WriteMessage(websocket.TextMessage, []byte(string(strconv.FormatInt(int64(len(packets)), 10))))
+
+				for _, packet := range packets {
+					err = conn.WriteMessage(websocket.BinaryMessage, packet)
 					if err != nil {
 						log.Println("write failed:", err)
 						break

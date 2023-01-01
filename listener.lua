@@ -40,51 +40,37 @@ local decoder = dfpwm.make_decoder()
 local websocket
 http.websocketAsync(gateway)
 
-local transferredSize = 0
-
 local statDelay = 1
 local statTimer = os.startTimer(0)
 
 local buffer = {}
-local bufferSize = 0
-local bufferBytes = 0
 
-local chunkOrder = 0
-
-local function dumpBuffer()
-    if #buffer > 0 then
-        local bufferChunk = buffer[1]
-        local chunkBuffer = decoder(bufferChunk.data)
-        local ok = speaker.playAudio(chunkBuffer)
-        if ok then
-            print("Queued chunk " .. bufferChunk.order .. " " .. #bufferChunk.data ..  " ".. #chunkBuffer)
-            table.remove(buffer, 1)
-            bufferSize = bufferSize - 1
-            bufferBytes = bufferBytes - #bufferChunk
-        end
-    end
-end
+local packetsReceived = 0
+local packetsTotal = 0
 
 while true do
     local event, paramA, paramB, paramC = os.pullEvent()
-    if event == "speaker_audio_empty" then
-        dumpBuffer()
-    elseif event == "websocket_message" then
-        bufferSize = bufferSize + 1
-        transferredSize = transferredSize + #paramB
-        bufferBytes = bufferBytes + #paramB
-        chunkOrder = chunkOrder + 1
+    if event == "websocket_message" then
+        local decoded = decoder(paramB)
+        table.insert(buffer, decoded)
 
-        print("Recv " .. chunkOrder .. " " .. #paramB)
-        table.insert(buffer, {order=chunkOrder, data=paramB})
+        packetsReceived = packetsReceived + 1
+        if packetsReceived == packetsTotal then
+            break
+        end
     elseif event == "timer" then
         statTimer = os.startTimer(statDelay)
-        print("Sz: " .. tostring(bufferSize) .. " Buf:" .. tostring(bufferBytes) .. " Tx:".. tostring(transferredSize))
-        dumpBuffer()
+
+        if packetsTotal > 0 then
+            print(math.floor((packetsReceived/packetsTotal)*100) .. " " .. packetsReceived .. "/" .. packetsTotal)
+        end
     elseif event == "websocket_success" then
         print("Connected to gateway")
         websocket = paramB
         websocket.send(textutils.serializeJSON({url=query}))
+
+        local event, _, totalPackets = os.pullEvent("websocket_message")
+        packetsTotal = tonumber(totalPackets)
     elseif event == "websocket_closed" then
         print("Connection closed")
         break
@@ -94,8 +80,8 @@ while true do
     end
 end
 
-print("Emptying buffer...")
-while bufferSize > 0 do
-    dumpBuffer()
-    sleep(0)
+for _, chunk in pairs(buffer) do
+    while not speaker.playAudio(chunk) do
+        os.pullEvent("speaker_audio_empty")
+    end
 end
