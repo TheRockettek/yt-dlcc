@@ -60,15 +60,15 @@ local function dumpBuffer()
             table.remove(buffer, 1)
             bufferSize = bufferSize - 1
             bufferBytes = bufferBytes - #bufferChunk
-
-            dumpBuffer()
         end
     end
 end
 
 while true do
     local event, paramA, paramB, paramC = os.pullEvent()
-    if event == "websocket_message" then
+    if event == "speaker_audio_empty" then
+        dumpBuffer()
+    elseif event == "websocket_message" then
         local chunk =  paramB
         local chunkBuffer = decoder(chunk)
         transferredSize = transferredSize + #chunk
@@ -79,6 +79,7 @@ while true do
         table.insert(buffer, {order=chunkOrder, data=chunkBuffer})
     elseif event == "timer" then
         statTimer = os.startTimer(statDelay)
+
         print("Sz: " .. tostring(bufferSize) .. " Buf:" .. tostring(bufferBytes) .. " Tx:".. tostring(transferredSize))
         dumpBuffer()
     elseif event == "websocket_success" then
