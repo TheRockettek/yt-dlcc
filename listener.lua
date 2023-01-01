@@ -56,16 +56,13 @@ end
 while true do
     local event, paramA, paramB, paramC = os.pullEvent()
     if event == "websocket_message" then
-        local chunk = paramB
-        local chunkBuffer = decoder(chunk)
+        local chunk =  paramB
+        local buffer = decoder(chunk)
         local transferredSize = transferredSize + #chunk
+        print("Transferred: " .. transferredSize)
+
         while not speaker.playAudio(chunkBuffer) do
             os.pullEvent("speaker_audio_empty")
-        end
-    elseif event == "timer" then
-        if paramA == statTimer then
-            statTimer = os.startTimer(statDelay)
-            print("Transferred: " .. transferredSize)
         end
     elseif event == "websocket_success" then
         print("Connected to gateway")
