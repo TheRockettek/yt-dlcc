@@ -93,7 +93,7 @@ while true do
         break
     end
 
-    while bufferSize > 0 then
+    while bufferSize > 0 do
         dumpBuffer()
         sleep(1)
     end
