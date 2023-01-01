@@ -79,7 +79,6 @@ while true do
         table.insert(buffer, {order=chunkOrder, data=chunkBuffer})
     elseif event == "timer" then
         statTimer = os.startTimer(statDelay)
-
         print("Sz: " .. tostring(bufferSize) .. " Buf:" .. tostring(bufferBytes) .. " Tx:".. tostring(transferredSize))
         dumpBuffer()
     elseif event == "websocket_success" then
@@ -93,9 +92,10 @@ while true do
         print("Failed to connect to gateway")
         break
     end
+end
 
-    while bufferSize > 0 do
-        dumpBuffer()
-        sleep(1)
-    end
+print("Emptying buffer...")
+while bufferSize > 0 do
+    dumpBuffer()
+    sleep(1)
 end
