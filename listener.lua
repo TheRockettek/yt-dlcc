@@ -75,13 +75,7 @@ while true do
         if paramB == "CONF" then
             websocket.send("ACK")
         else
-            local samples = {}
-            for i=1, #paramB do
-                local byte = byte(sub(paramB, i, i))
-                table.insert(samples, byte - 128)
-            end
-
-            table.insert(buffer, samples)
+            table.insert(buffer, table.pack(("b"):rep(#paramB):unpack(paramB)))
 
             packetsReceived = packetsReceived + 1
             print(packetsReceived .. "/" .. packetsTotal)

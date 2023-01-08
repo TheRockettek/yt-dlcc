@@ -80,7 +80,7 @@ func main() {
 
 				conn.WriteMessage(websocket.TextMessage, []byte(string(strconv.FormatInt(int64(len(packets)), 10))))
 
-				bunchCount := 1
+				bunchCount := 10
 
 				confCmd := []byte("CONF")
 
