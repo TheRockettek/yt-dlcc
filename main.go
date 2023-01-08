@@ -59,26 +59,17 @@ func main() {
 
 			if validateURL(query.URL) {
 				log.Println("Query for " + query.URL)
-				command := fmt.Sprintf("yt-dlp --quiet %s -o - | ffmpeg -hide_banner -loglevel error -nostats -i pipe: -ac 1 -f wav -c:a pcm_s16le pipe: | ffmpeg -hide_banner -loglevel error -nostats -i pipe: -b:a 48000 -ar 48000 -c:a dfpwm -f dfpwm pipe:", query.URL)
-				// command := fmt.Sprintf("yt-dlp --quiet %s -o - | ffmpeg -hide_banner -loglevel error -nostats -i pipe: -filter:a \"volume=0.5\" -f dfpwm -ar 48000 -ac 1 pipe:", query.URL)
 
-				cmd := exec.Command("bash", "-c", command)
-				stdout, err := cmd.StdoutPipe()
-				cmd.Stderr = cmd.Stdout
-				if err != nil {
-					log.Println("stdout failed:", err)
-					break
-				}
-				if err = cmd.Start(); err != nil {
-					log.Println("start failed:", err)
-					break
-				}
+				exec.Command("bash", "-c", fmt.Sprintf("yt-dlp --force-overwrites --extract-audio --audio-format opus %s -o out.opus", query.URL)).Run()
+				exec.Command("bash", "-c", "ffmpeg -y -i out.opus -ac 1 -f wav -b:a 48000 -ar 48000 -c:a pcm_u8 out.pcm").Run()
+
+				f, _ := os.Open("out.pcm")
 
 				packets := make([][]byte, 0)
 
 				for {
 					tmp := make([]byte, 1024*16)
-					_, err := stdout.Read(tmp)
+					_, err := f.Read(tmp)
 					if err != nil {
 						log.Println("read stdout failed:", err)
 						break
@@ -87,14 +78,15 @@ func main() {
 					packets = append(packets, tmp)
 				}
 
-				println(len(packets))
 				conn.WriteMessage(websocket.TextMessage, []byte(string(strconv.FormatInt(int64(len(packets)), 10))))
 
-				bunchCount := 50
+				bunchCount := 1
 
 				confCmd := []byte("CONF")
 
 				for packetIndex, packet := range packets {
+					println(packetIndex)
+
 					err = conn.WriteMessage(websocket.BinaryMessage, packet)
 					if err != nil {
 						log.Println("write failed:", err)
@@ -102,11 +94,13 @@ func main() {
 					}
 
 					if packetIndex%bunchCount == 0 {
-						err = conn.WriteMessage(websocket.BinaryMessage, confCmd)
+						err = conn.WriteMessage(websocket.TextMessage, confCmd)
 						if err != nil {
 							log.Println("write failed:", err)
 							break
 						}
+
+						// println("WAITING FOR ACK")
 
 						_, _, err := conn.ReadMessage()
 						if err != nil {
