@@ -87,6 +87,10 @@ while true do
             print(packetsReceived .. "/" .. packetsTotal)
 
             tryPlayFromBuffer()
+
+            if packetsReceived >= packetsTotal then
+                break
+            end
         end
     elseif event == "websocket_success" then
         print("Connected to gateway")
@@ -102,4 +106,12 @@ while true do
         print("Failed to connect to gateway")
         break
     end
+end
+
+while true do
+    tryPlayFromBuffer()
+    if #buffer == 0 then
+        break
+    end
+    sleep(0)
 end
